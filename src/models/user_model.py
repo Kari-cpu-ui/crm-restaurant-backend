@@ -15,14 +15,18 @@ class User(Base):                                 # Modelo users
     role = Column(String(10), default=Rol.cliente)
     is_active = Column(Boolean, default=True)
     
-class UserCreate(Base):
-    name: str
-    email: str
-    password: str
-    role: str
-    is_active: bool
-    
-class UserLogin(Base):
-    mail: str
-    password: str
+# Comentadas para evitar que SQLAlchemy intente mapearlas como modelos ORM.
+# Si se desean usar como esquemas Pydantic, moverlas a `src/schemas/user_schema.py`.
+#
+# class UserCreate(Base):
+#     name: str
+#     email: str
+#     password: str
+#     role: str
+#     is_active: bool
+#
+# class UserLogin(Base):
+#     mail: str
+#     password: str
+
 

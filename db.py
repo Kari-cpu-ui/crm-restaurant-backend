@@ -23,4 +23,16 @@ Base = declarative_base()
                        # Clase Base para todos los modelos 
 
 
+def get_db():
+    """Yield a SQLAlchemy Session and ensure it's closed after use.
+
+    This is used as a FastAPI dependency in routers (Depends(get_db)).
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 
