@@ -3,7 +3,8 @@ from db import engine, SessionLocal
 from src.models import user_model, table_model, reservation_model
 from src.models.user_model import User, Rol
 from src.routers.user_router import router as user_router  # import rutas de usuarios
-from src.routers.auth_router import router as auth_router
+from src.routers.auth_router import router as auth_router # import rutas para el login
+
 from auth import hash_password # password
 
 app = FastAPI(title="CRM Restaurante")  # Crear app FastAPI

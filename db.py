@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine # Crea la conexión a BBDD
 from sqlalchemy.ext.declarative import declarative_base # Base para modelos (Object Relational Mapping "ORM")
-from sqlalchemy.orm import sessionmaker # Creador de modelos 
+from sqlalchemy.orm import Session, sessionmaker # Creador de modelos 
 import os  # Acceso a variables de entorno
 from dotenv import load_dotenv # Cargar variables desde .env
 
@@ -21,6 +21,14 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine) # No
 # Base para modelos
 Base = declarative_base()
                        # Clase Base para todos los modelos 
+
+# Función get_db para usar con Depends
+def get_db():
+    db: Session = SessionLocal()  # Crear sesión
+    try:
+        yield db                # yield la hace usable como dependencia
+    finally:
+        db.close()              # Cerrar al terminar
 
 
 def get_db():

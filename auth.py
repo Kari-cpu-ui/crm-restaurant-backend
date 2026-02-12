@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
-import jwt
-from jwt import PyJWTError as JWTError
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 SECRET_KEY = "supersecretkey"
