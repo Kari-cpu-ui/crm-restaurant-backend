@@ -52,11 +52,14 @@ def create_reservation(reservation: ReservationCreate, db: Session = Depends(get
     return db_reservation
 
 # Cancelar reserva
-@router.delete("/{reservation_id}")
+@router.delete("/{reservation_id}", response_model=ReservationRead)
 def cancel_reservation(reservation_id: int, db: Session = Depends(get_db)):
     reservation = db.query(Reservation).filter(Reservation.id == reservation_id).first()
     if not reservation:
         raise HTTPException(status_code=404, detail="Reserva no encontrada")
+    
     reservation.status = "cancelled"
     db.commit()
-    return {"detail": "Reserva cancelada correctamente"}
+    db.refresh(reservation)
+    return reservation
+

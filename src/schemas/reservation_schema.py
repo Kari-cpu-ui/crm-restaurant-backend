@@ -3,7 +3,7 @@ from datetime import date
 
 # Schema para crear una reserva
 class ReservationCreate(BaseModel):
-    Table_id: int         # ID de la mesa
+    table_id: int         # ID de la mesa
     customer_name: str    # Nombre del cliente
     date: date            # Fecha de reserva
     guests: int           # Cantidad de personas
@@ -14,4 +14,4 @@ class ReservationRead(ReservationCreate):
     status: str           # Estado: "active" o "cancelled"
 
     class Config:
-        from_attributes = True  # Permite convertir desde el modelo ORM
+        orm_mode = True  # Permite convertir desde el modelo ORM
