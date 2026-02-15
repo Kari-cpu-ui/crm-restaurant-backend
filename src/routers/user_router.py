@@ -1,8 +1,19 @@
 from fastapi import APIRouter, Depends             # Router y dependencias
 from sqlalchemy.orm import Session                # Tipo Sesión DB
-from db import SessionLocal                       # Creador de sesiones
+from db import SessionLocal, get_db                       # Creador de sesiones
 from src.models.user_model import User                # Modelo (Object Relational Mapping)
 from src.schemas.user_schema import UserCreate, UserRead  # Esquemas
+from pydantic import BaseModel
+
+# --- Agregado esto para evitar el error de UserResponse ---
+class UserResponse(BaseModel):             # Comentario: Defino UserResponse para la salida GET users
+    id: int
+    name: str
+    email: str
+    is_admin: bool
+ 
+    class Config:                          # Comentario: Configuración para que funcione con SQLAlchemy
+        orm_mode = True
 
 router = APIRouter(  # Router independiente
     prefix="/users",                             
@@ -16,9 +27,14 @@ def get_db():            # Dependencia DB
     finally:
         db.close()  # Cerrar sesión
 
-@router.get("/", response_model=list[UserRead])  # GET users
+# @router.get("/", response_model=list[UserRead])  # GET users
+# def get_users(db: Session = Depends(get_db)): # Inyecta sesión
+#     return db.query(User).all() # SELECT * FROM users
+
+@router.get("/", response_model=list[UserResponse])  # GET users
 def get_users(db: Session = Depends(get_db)): # Inyecta sesión
-    return db.query(User).all() # SELECT * FROM users
+    users = db.query(User).all()
+    return users # SELECT * FROM users
 
 @router.post("/", response_model=UserRead)       # POST users
 def create_user(user: UserCreate, db: Session = Depends(get_db)):

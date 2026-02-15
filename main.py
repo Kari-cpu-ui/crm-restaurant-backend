@@ -6,7 +6,7 @@ from src.routers.user_router import router as user_router  # import rutas de usu
 from src.routers.auth_router import router as auth_router # import rutas para el login
 from src.routers.table_router import router as table_router
 from src.routers.reservation_router import router as reservation_router
-from auth import hash_password  # password
+from auth import get_password_hash  # password
 
 
 app = FastAPI(title="CRM Restaurante")
@@ -33,7 +33,7 @@ def create_default_admin():
         new_admin = User(
             username="admin",
             email="admin@restaurant.com",
-            password=hash_password("admin123"),
+            password=get_password_hash("admin123"),
             is_admin=False
         )
         db.add(new_admin)

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db import get_db
 from src.models.user_model import User
-from auth import verify_password, create_access_token, hash_password
+from auth import verify_password, create_access_token, get_password_hash
 
 router = APIRouter(prefix="/users/auth", tags=["Auth"])
 
@@ -30,7 +30,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 
     token = create_access_token({
         "sub": user.email,
-        # "is_admin": user.is_admin
+        "is_admin": user.is_admin,
         "password": user.password
     })
     return {"access_token": token, "token_type": "bearer"}
@@ -49,8 +49,8 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
     new_user = User(
         name=data.name,
         email=data.email,
-        password=hash_password(data.password),
-        #is_admin=False  # usuarios nuevos no son admin
+        password=get_password_hash(data.password),
+        is_admin=False  # usuarios nuevos no son admin
     )
 
     db.add(new_user)
