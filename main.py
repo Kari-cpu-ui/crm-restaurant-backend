@@ -1,30 +1,48 @@
-from fastapi import FastAPI  # Framework
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware  # para CORS
 from db import engine, SessionLocal
 from src.models import user_model, table_model, reservation_model
 from src.models.user_model import User
-from src.routers.user_router import router as user_router  # import rutas de usuarios
-from src.routers.auth_router import router as auth_router # import rutas para el login
+from src.routers.user_router import router as user_router
+from src.routers.auth_router import router as auth_router
 from src.routers.table_router import router as table_router
 from src.routers.reservation_router import router as reservation_router
-from auth import get_password_hash  # password
+from auth import get_password_hash
 
-
+# Inicializar FastAPI
 app = FastAPI(title="CRM Restaurante")
 
+# Configurar CORS
+origins = [
+    "http://localhost:4200",  # Angular
+    "http://127.0.0.1:4200"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite GET, POST, PUT, DELETE, etc.
+    allow_headers=["*"],
+)
+
+# Ruta raíz de prueba
 @app.get("/")
 def read_root():
     return {"message": "Servidor funcionando correctamente"}
 
+# Crear tablas si no existen
 user_model.Base.metadata.create_all(bind=engine)
 table_model.Base.metadata.create_all(bind=engine)
-reservation_model.Base.metadata.create_all(bind=engine) 
+reservation_model.Base.metadata.create_all(bind=engine)
 
-# incluir/conectar routers
-app.include_router(user_router)
-app.include_router(auth_router)
+# Incluir routers
+app.include_router(user_router, prefix="/users", tags=["Users"])
+app.include_router(auth_router, prefix="/users/auth", tags=["Auth"])
+app.include_router(table_router)
+app.include_router(reservation_router)
 
-
-#  crear admin
+# Crear admin por defecto
 def create_default_admin():
     db = SessionLocal()
     admin = db.query(User).filter(User.username == "admin").first()
@@ -41,8 +59,5 @@ def create_default_admin():
     
     db.close()
 
-# Conectar routers
-app.include_router(user_router, prefix="/users", tags=["Users"])
-app.include_router(auth_router, prefix="/users/auth", tags=["Auth"])
-app.include_router(table_router)           
-app.include_router(reservation_router)    
+# Ejecutar creación del admin al iniciar
+create_default_admin()
