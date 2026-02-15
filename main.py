@@ -7,6 +7,7 @@ from src.routers.user_router import router as user_router
 from src.routers.auth_router import router as auth_router
 from src.routers.table_router import router as table_router
 from src.routers.reservation_router import router as reservation_router
+from src.routers.review_router import router as review_router
 from auth import get_password_hash
 
 # Inicializar FastAPI
@@ -42,6 +43,7 @@ app.include_router(user_router, prefix="/users", tags=["Users"])
 app.include_router(auth_router, prefix="/users/auth", tags=["Auth"])
 app.include_router(table_router)
 app.include_router(reservation_router)
+app.include_router(review_router)
 
 # Crear admin por defecto
 def create_default_admin():
