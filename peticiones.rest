@@ -1,0 +1,27 @@
+@host = http://localhost
+@port = 8000
+
+### insertar un nuevo usuario
+PUT {{host}}:{{port}}/register
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Moises",
+  "email": "moises_sql@gmail.com",
+  "password": "$2y$10$C3d4E5f6G7h8I9j0K1L2M",
+  "rol": "cliente",
+}
+
+### login
+POST {{host}}:{{port}}/users/auth/login
+Content-Type: application/json
+
+{
+  "email": "chef_tomas@resto.example",
+  "password": "R3sto!2026_U07"
+}
+
+
+### usuarios
+GET {{host}}:{{port}}/users/

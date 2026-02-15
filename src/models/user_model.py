@@ -1,28 +1,28 @@
-from sqlalchemy import Column, Integer, String, Boolean    # Tipos columnas
-from db import Base                               # Base común ORM
+from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from pydantic import BaseModel, EmailStr
 
-class Rol(str):
-    cliente = "cliente"
-    administrador = "administrador"
+# Base ORM
+Base = declarative_base()
 
-class User:                                 # Modelo users
-    __tablename__ = "users"                       # Nombre tabla en MySQL
- 
-    id = Column(Integer, primary_key=True)        # ID 
-    name = Column(String(100), nullable=False)    # Nombre obligatorio
-    email = Column(String(100), unique=True)      # Email único
-    password = Column(String(255), nullable=False)# Password obligatorio
-    role = Column(String(10), default=Rol.cliente)
-    is_active = Column(Boolean, default=True)
-    
-class UserCreate:
+# Modelo SQLAlchemy
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
+    password = Column(String(255), nullable=False),
+    is_admin = Column(Boolean, default=False)  # rol como string normal
+
+
+# Modelos Pydantic para validación
+class UserCreate(BaseModel):
     name: str
-    email: str
+    email: EmailStr
     password: str
-    role: str
-    is_active: bool
-    
-class UserLogin:
-    mail: str
-    password: str
+    is_admin: bool
 
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str

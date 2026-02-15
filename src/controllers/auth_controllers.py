@@ -6,37 +6,49 @@ from auth import hash_password, verify_password, create_token
 
 
 async def register(user: UserCreate):
+    conn = None
     try:
         conn = await get_conexion()
         async with conn.cursor(Base.DictCursor) as cursor:
             hashed_pass = hash_password(user.password)
+            
+            # INSERT corregido (solo 5 placeholders)
             await cursor.execute(
-                "INSERT INTO users (name,email,password,role, is_active) VALUES (%s,%s,%s,%s,%s,%s,%s)",
+                "INSERT INTO users (name, email, password, role, is_active) VALUES (%s,%s,%s,%s,%s)",
                 (
                     user.name,
                     user.email,
                     hashed_pass,
-                    user.role,
-                    user.is_active,
+                    user.is_admin
                 ),
             )
             await conn.commit()
+            
             new_id = cursor.lastrowid
-            user = await ("SELECT * FROM 202509_shop.users WHERE id=%s", (new_id))
-            return {"msg": "Usuario registrado correctamente", "item": user}
+            
+            # Obtener el usuario insertado
+            await cursor.execute(
+                "SELECT * FROM users WHERE id=%s", (new_id,)
+            )
+            new_user = await cursor.fetchone()
+            
+            return {"msg": "Usuario registrado correctamente", "item": new_user}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
     finally:
-        conn.close()
+        if conn:
+            await conn.close()
 
 
 async def login(user_login: UserLogin):
+    conn = None
     try:
         conn = await get_conexion()
         async with conn.cursor(Base.DictCursor) as cursor:
+            # Campo correcto: email
             await cursor.execute(
-                "SELECT * FROM 202509_shop.users WHERE mail=%s", (user_login.mail)
+                "SELECT * FROM users WHERE email=%s", (user_login.email,)
             )
             user = await cursor.fetchone()
             if not user:
@@ -44,17 +56,20 @@ async def login(user_login: UserLogin):
                     status_code=404, detail="Usuario o password incorrecto"
                 )
 
-            # verificar la contraseña
+            # Verificar la contraseña
             if not verify_password(user_login.password, user["password"]):
                 raise HTTPException(
                     status_code=404, detail="Usuario o password incorrecto"
                 )
-            # vamos crear el token con los datos y la funcion que hemos trabajado en security
-            token_data = {"id": user["id"], "rol": user["rol"]}
+
+            # Crear token
+            token_data = {"id": user["id"], "email": user["email"]}
             token = create_token(token_data)
+
             return {"msg": "Usuario logado correctamente", "token": token}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
     finally:
-        conn.close()
+        if conn:
+            await conn.close()

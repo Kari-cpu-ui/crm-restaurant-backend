@@ -1,7 +1,7 @@
 from fastapi import FastAPI # Franwork
 from db import engine, SessionLocal
 from src.models import user_model, table_model, reservation_model
-from src.models.user_model import User, Rol
+from src.models.user_model import User
 from src.routers.user_router import router as user_router  # import rutas de usuarios
 from src.routers.auth_router import router as auth_router # import rutas para el login
 
@@ -18,8 +18,8 @@ table_model.Base.metadata.create_all(bind=engine)
 reservation_model.Base.metadata.create_all(bind=engine) 
 
 # incluir/conectar routers
-app.include_router(user_router, prefix="/users", tags=["Users"])
-app.include_router(auth_router, prefix="/users/auth", tags=["Auth"])
+app.include_router(user_router)
+app.include_router(auth_router)
 
 
 #  crear admin
@@ -31,8 +31,8 @@ def create_default_admin():
         new_admin = User(
             username="admin",
             email="admin@restaurant.com",
-            hashed_password=hash_password("admin123"),
-            role=Rol.administrador
+            password=hash_password("admin123"),
+            is_admin=False
         )
         db.add(new_admin)
         db.commit()
