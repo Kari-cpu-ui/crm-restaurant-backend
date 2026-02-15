@@ -1,17 +1,19 @@
-from fastapi import FastAPI # Franwork
+from fastapi import FastAPI  # Framework
 from db import engine, SessionLocal
 from src.models import user_model, table_model, reservation_model
 from src.models.user_model import User
 from src.routers.user_router import router as user_router  # import rutas de usuarios
 from src.routers.auth_router import router as auth_router # import rutas para el login
+from src.routers.table_router import router as table_router
+from src.routers.reservation_router import router as reservation_router
+from auth import hash_password  # password
 
-from auth import hash_password # password
 
-app = FastAPI(title="CRM Restaurante")  # Crear app FastAPI
+app = FastAPI(title="CRM Restaurante")
 
 @app.get("/")
 def read_root():
-    return {"menssage": "Servidor funcionando correctamente"}
+    return {"message": "Servidor funcionando correctamente"}
 
 user_model.Base.metadata.create_all(bind=engine)
 table_model.Base.metadata.create_all(bind=engine)
@@ -39,3 +41,8 @@ def create_default_admin():
     
     db.close()
 
+# Conectar routers
+app.include_router(user_router, prefix="/users", tags=["Users"])
+app.include_router(auth_router, prefix="/users/auth", tags=["Auth"])
+app.include_router(table_router)           
+app.include_router(reservation_router)    
