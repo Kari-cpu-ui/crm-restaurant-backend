@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware  # para CORS
 from db import engine, SessionLocal
-from src.models import user_model, table_model, reservation_model
+from src.models import user_model, table_model, reservation_model, review_model
 from src.models.user_model import User
 from src.routers.user_router import router as user_router
 from src.routers.auth_router import router as auth_router
@@ -35,6 +35,7 @@ def read_root():
 user_model.Base.metadata.create_all(bind=engine)
 table_model.Base.metadata.create_all(bind=engine)
 reservation_model.Base.metadata.create_all(bind=engine)
+review_model.Base.metadata.create_all(bind=engine)
 
 # Incluir routers
 app.include_router(user_router, prefix="/users", tags=["Users"])
