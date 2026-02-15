@@ -45,11 +45,11 @@ app.include_router(reservation_router)
 # Crear admin por defecto
 def create_default_admin():
     db = SessionLocal()
-    admin = db.query(User).filter(User.username == "admin").first()
+    admin = db.query(User).filter(User.name == "admin").first()
     
     if not admin:
         new_admin = User(
-            username="admin",
+            name="admin",
             email="admin@restaurant.com",
             password=get_password_hash("admin123"),
             is_admin=False

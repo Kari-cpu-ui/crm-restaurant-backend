@@ -6,11 +6,11 @@ from src.routers.auth_router import hash_password
 def create_default_admin():
     db = SessionLocal()
     try:
-        admin = db.query(User).filter(User.username == "admin").first()
+        admin = db.query(User).filter(User.name == "admin").first()
 
         if not admin:
             new_admin = User(
-                username="admin",
+                name="admin",
                 email="admin@restaurant.com",
                 hashed_password=hash_password("admin123"),
                 role=Rol.administrador
