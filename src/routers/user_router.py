@@ -13,7 +13,7 @@ class UserResponse(BaseModel):             # Comentario: Defino UserResponse par
     is_admin: bool
  
     class Config:                          # Comentario: Configuración para que funcione con SQLAlchemy
-        orm_mode = True
+        from_attributes = True
 
 router = APIRouter(  # Router independiente
     prefix="/users",                             

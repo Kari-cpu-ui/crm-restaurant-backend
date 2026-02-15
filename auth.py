@@ -2,26 +2,24 @@ from datetime import datetime, timedelta
 from jose import jwt
 from passlib.context import CryptContext
 
-# =========================
+
 # Configuración JWT
-# =========================
 
 SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-# =========================
+
 # Configuración Password Hashing
-# =========================
+
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
 )
 
-# =========================
 # Funciones de Password
-# =========================
+
 
 def get_password_hash(password: str) -> str:
     """
@@ -38,9 +36,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password[:72], hashed_password)
 
 
-# =========================
 # JWT
-# =========================
+
 
 def create_access_token(email: str, is_admin: bool = False) -> str:
     """

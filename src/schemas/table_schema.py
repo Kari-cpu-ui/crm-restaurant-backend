@@ -13,7 +13,7 @@ class TableRead(BaseModel):
     capacity: int
 
     class Config:
-        orm_mode = True   # Muy importante para que funcione con SQLAlchemy
+        from_attributes = True   # Muy importante para que funcione con SQLAlchemy
 
 # Schema para actualizar una mesa (campos opcionales)
 class TableUpdate(BaseModel):
