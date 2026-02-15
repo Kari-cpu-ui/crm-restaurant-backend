@@ -14,4 +14,4 @@ class ReservationRead(ReservationCreate):
     status: str           # Estado: "active" o "cancelled"
 
     class Config:
-         from_attributes = True  # Permite convertir desde el modelo ORM
+        orm_mode = True  # Permite convertir desde el modelo ORM

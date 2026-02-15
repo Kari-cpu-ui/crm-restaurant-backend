@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware  # para CORS
 from db import engine, SessionLocal
-from src.models import user_model, table_model, reservation_model
+from src.models import user_model, table_model, reservation_model, review_model
 from src.models.user_model import User
 from src.routers.user_router import router as user_router
 from src.routers.auth_router import router as auth_router
 from src.routers.table_router import router as table_router
 from src.routers.reservation_router import router as reservation_router
+from src.routers.review_router import router as review_router
 from auth import get_password_hash
 
 # Inicializar FastAPI
@@ -35,12 +36,14 @@ def read_root():
 user_model.Base.metadata.create_all(bind=engine)
 table_model.Base.metadata.create_all(bind=engine)
 reservation_model.Base.metadata.create_all(bind=engine)
+review_model.Base.metadata.create_all(bind=engine)
 
 # Incluir routers
 app.include_router(user_router, prefix="/users", tags=["Users"])
 app.include_router(auth_router, prefix="/users/auth", tags=["Auth"])
 app.include_router(table_router)
 app.include_router(reservation_router)
+app.include_router(review_router)
 
 # Crear admin por defecto
 def create_default_admin():
@@ -52,7 +55,7 @@ def create_default_admin():
             name="admin",
             email="admin@restaurant.com",
             password=get_password_hash("admin123"),
-            is_admin=False
+            is_admin=True
         )
         db.add(new_admin)
         db.commit()
