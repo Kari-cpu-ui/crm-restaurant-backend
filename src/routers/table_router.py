@@ -45,7 +45,7 @@ def update_table(table_id: int, table_update: TableUpdate, db: Session = Depends
     """
     Actualiza los datos de una mesa existente (nombre o capacidad)
     """
-    table = db.query(Table).filter(Table.id == table_id).first()  # Buscar la mesa
+    table = db.query(Table).filter(Table.id == table_id).first()  # Busca la mesa
     if not table:
         raise HTTPException(status_code=404, detail="Mesa no encontrada")
 

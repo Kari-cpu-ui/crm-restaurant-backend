@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware  # para CORS
 from db import engine, SessionLocal
+# Import de módulos propios
 from src.models import user_model, table_model, reservation_model, review_model
 from src.models.user_model import User
 from src.routers.user_router import router as user_router
