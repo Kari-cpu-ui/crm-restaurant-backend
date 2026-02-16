@@ -21,9 +21,8 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],  # Permite GET, POST, PUT, DELETE, etc.
+    allow_origins=["*"],  # permite todas las IPs y dominios
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
