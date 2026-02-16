@@ -55,7 +55,7 @@ def create_default_admin():
             name="admin",
             email="admin@restaurant.com",
             password=get_password_hash("admin123"),
-            is_admin=True
+            is_admin=False
         )
         db.add(new_admin)
         db.commit()

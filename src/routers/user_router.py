@@ -15,10 +15,7 @@ class UserResponse(BaseModel):             # Comentario: Defino UserResponse par
     class Config:                          # Comentario: Configuración para que funcione con SQLAlchemy
         from_attributes = True
 
-router = APIRouter(  # Router independiente
-    prefix="/users",                             
-    tags=["Users"]                                
-)
+router = APIRouter()
 
 def get_db():            # Dependencia DB
     db = SessionLocal()   # Crear sesión

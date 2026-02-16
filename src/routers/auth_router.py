@@ -17,33 +17,6 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
-# Registro seguro
-# @router.post("/register")
-# def register(data: RegisterRequest, db: Session = Depends(get_db)):
-#     existing_user = db.query(User).filter(User.email == data.email).first()
-#     if existing_user:
-#         raise HTTPException(status_code=400, detail="El email ya está registrado")
-
-#     new_user = User(
-#         name=data.name,
-#         email=data.email,
-#         password=get_password_hash(data.password),
-#         is_admin=False
-#     )
-
-#     try:
-#         db.add(new_user)
-#         db.commit()
-#         db.refresh(new_user)
-#     except Exception as e:
-#         db.rollback()
-#         raise HTTPException(status_code=500, detail=f"Error registrando usuario: {str(e)}")
-    
-#     return {
-#         "message": "Usuario registrado exitosamente",
-#         "user_id": new_user.id
-#     }
-
 @router.post("/register")
 def register(data: dict, db: Session = Depends(get_db)):
     try:
@@ -89,4 +62,6 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         "is_admin": user.is_admin
     })
 
-    return {"access_token": token, "token_type": "bearer"}
+    return {"access_token": token, 
+            "token_type": "bearer",
+            "is_admin": user.is_admin}

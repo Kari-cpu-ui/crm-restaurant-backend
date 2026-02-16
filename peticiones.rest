@@ -6,11 +6,11 @@ POST  {{host}}:{{port}}/users/auth/register
 Content-Type: application/json
 
 {
-  "id": 51,
-  "name": "Moises",
-  "email": "moises_sql@gmail.com",
-  "is_admin": 1,
-  "password": "$2y$10$C3d4E5f6G7h8I9j0K1L2M"
+  "id": 61,
+  "name": "admin",
+  "email": "admintest@gmail.com",
+  "is_admin": 2,
+  "password": "12345"
 }
 
 ### login
