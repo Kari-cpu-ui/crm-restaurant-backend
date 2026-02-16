@@ -39,12 +39,6 @@ API REST para la gestión de un restaurante, desarrollada con **FastAPI**.
 
 
 
-## Ejecutar el servidor
-
-```bash
-uvicorn main:app --reload
-```
-
 El servidor se iniciará en `http://127.0.0.1:8000`.
 
 ## Documentación de la API
