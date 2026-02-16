@@ -51,6 +51,11 @@ def create_reservation(reservation: ReservationCreate, db: Session = Depends(get
     db.refresh(db_reservation)
     return db_reservation
 
+# Obtener reservas por usuario
+@router.get("/user/{user_id}", response_model=list[ReservationRead])
+def get_reservations_by_user(user_id: int, db: Session = Depends(get_db)):
+    return db.query(Reservation).filter(Reservation.customer_name == user_id).all()
+
 # Cancelar reserva
 @router.delete("/{reservation_id}", response_model=ReservationRead)
 def cancel_reservation(reservation_id: int, db: Session = Depends(get_db)):

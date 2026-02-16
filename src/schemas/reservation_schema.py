@@ -3,14 +3,12 @@ from datetime import date
 
 # Schema para crear una reserva
 class ReservationCreate(BaseModel):
-    id: int
     table_id: int         # ID de la mesa
     customer_name: str    # Nombre del cliente
     date: date            # Fecha de reserva
     guests: int           # Cantidad de personas
-    status: str
 
-class Config:
+    class Config:
         orm_mode = True
 
 # Schema para devolver información de una reserva
