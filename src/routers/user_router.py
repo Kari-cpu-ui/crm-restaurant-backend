@@ -6,13 +6,13 @@ from src.schemas.user_schema import UserCreate, UserRead  # Esquemas
 from pydantic import BaseModel
 
 # --- Agregado esto para evitar el error de UserResponse ---
-class UserResponse(BaseModel):             # Comentario: Defino UserResponse para la salida GET users
+class UserResponse(BaseModel):             #  Defino UserResponse para la salida GET users
     id: int
     name: str
     email: str
     is_admin: bool
  
-    class Config:                          # Comentario: Configuración para que funcione con SQLAlchemy
+    class Config:                          #  Configuración para que funcione con SQLAlchemy
         from_attributes = True
 
 router = APIRouter()

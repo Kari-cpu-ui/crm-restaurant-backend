@@ -7,7 +7,10 @@ from auth import get_password_hash, verify_password, create_access_token
 
 router = APIRouter()
 
-# Esquemas Pydantic
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
 class RegisterRequest(BaseModel):
     name: str
     email: EmailStr
@@ -51,6 +54,8 @@ def register(data: dict, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
 # Login seguro
+# Login
+
 @router.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
@@ -65,3 +70,24 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     return {"access_token": token, 
             "token_type": "bearer",
             "is_admin": user.is_admin}
+
+# Registro
+
+@router.post("/register")
+def register(data: RegisterRequest, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(User.email == data.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="El email ya está registrado")
+#Nuevo usuario
+    new_user = User(
+        name=data.name,
+        email=data.email,
+        password=get_password_hash(data.password),
+        is_admin=False  # usuarios nuevos /no son admin
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {"message": "Usuario registrado exitosamente", "user_id": new_user.id}
