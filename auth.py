@@ -39,16 +39,35 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # JWT
 
 
-def create_access_token(email: str, is_admin: bool = False) -> str:
+from typing import Any, Dict, Optional
+
+
+def create_access_token(payload: Optional[Dict[str, Any]] = None,
+                        email: Optional[str] = None,
+                        user_id: Optional[int] = None,
+                        is_admin: bool = False) -> str:
     """
-    Genera un token JWT seguro, solo con información mínima necesaria:
-    - sub: email del usuario
-    - is_admin: rol de administrador
-    - exp: fecha de expiración
+    Genera un token JWT. Acepta dos modos de uso:
+    - `payload` (dict): cuando se pasa todo el payload ya formado.
+    - `email` / `user_id` / `is_admin`: construcción explícita.
+
+    Siempre añade `exp` y, si está disponible, `user_id`.
     """
-    to_encode = {
-        "sub": email,
-        "is_admin": is_admin,
-        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    }
+    if payload is None:
+        to_encode: Dict[str, Any] = {}
+    else:
+        # hacer una copia para no mutar el dict externo
+        to_encode = dict(payload)
+
+    if email is not None:
+        to_encode["sub"] = email
+
+    if user_id is not None:
+        to_encode["user_id"] = user_id
+
+    # preferir explicit `is_admin` argumento si viene, sino respetar payload
+    to_encode["is_admin"] = is_admin or to_encode.get("is_admin", False)
+
+    to_encode["exp"] = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
