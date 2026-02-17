@@ -1,3 +1,5 @@
+import fastapi
+from fastapi.templating import Jinja2Templates
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware  # para CORS
 from db import engine, SessionLocal
@@ -12,6 +14,7 @@ from src.routers.table_router import router as table_router
 from src.routers.reservation_router import router as reservation_router
 from src.routers.review_router import router as review_router
 from src.routers.menu_router import router as menu_router
+from src.schemas.menu_schema import MenuCreate, MenuResponse, MenuOut
 from auth import get_password_hash
 
 # Inicializar FastAPI

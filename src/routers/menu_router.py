@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime
 from db import SessionLocal
+from typing import List
 from src.models.menu_model import Menu
-from src.schemas.menu_schema import MenuCreate, MenuResponse
+from src.schemas.menu_schema import MenuCreate, MenuResponse, MenuOut
+
 
 router = APIRouter(
     prefix="/menus",
@@ -18,6 +21,20 @@ def get_db():
         db.close()
 
 
+# Endpoint para obtener menú por fecha
+@router.get("/{menu_date}", response_model=MenuOut)
+def get_menu(menu_date: str, db: Session = Depends(get_db)):
+    menu = db.query(Menu).filter(Menu.date == menu_date).first()
+    if not menu:
+        raise HTTPException(status_code=404, detail="Menú no encontrado")
+
+    # Convertimos a formato con pizzas como lista
+    pizzas = [
+        {"name": menu.name, "category": "menu.description", "price": menu.price},
+    ]
+    return {"menu_date": menu.date, "pizzas": pizzas}
+
+
 # Listar todos los menús
 @router.get("/", response_model=list[MenuResponse])
 def get_menus(db: Session = Depends(get_db)):
@@ -25,12 +42,21 @@ def get_menus(db: Session = Depends(get_db)):
 
 
 # Obtener menú por fecha
-@router.get("/date/{date}", response_model=MenuResponse)
-def get_menu_by_date(date: str, db: Session = Depends(get_db)):
-    menu = db.query(Menu).filter(Menu.date == date).first()
+@router.get("/date/{menu_date}", response_model=MenuResponse)
+def get_menu_by_date(menu_date: str, db: Session = Depends(get_db)):
+
+    try:
+        date_obj = datetime.strptime(menu_date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Formato de fecha inválido")
+
+    menu = db.query(Menu).filter(Menu.menu_date == date_obj).first()
+
     if not menu:
         raise HTTPException(status_code=404, detail="Menú no encontrado para esta fecha")
+
     return menu
+
 
 
 # Obtener menú por ID
@@ -49,11 +75,13 @@ def create_menu(menu: MenuCreate, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=400, detail="Ya existe un menú para esta fecha")
     db_menu = Menu(
-        date=menu.date,
-        first_course=menu.first_course,
-        second_course=menu.second_course,
-        dessert=menu.dessert,
-        price=menu.price
+        name=menu.name,
+        menu_date=menu.menu_date,
+        description=menu.description,
+        price=menu.price,
+        category_id=menu.category_id,
+        is_active=menu.is_active,
+        image_url=menu.image_url
     )
     db.add(db_menu)
     db.commit()
@@ -67,11 +95,13 @@ def update_menu(menu_id: int, menu: MenuCreate, db: Session = Depends(get_db)):
     db_menu = db.query(Menu).filter(Menu.id == menu_id).first()
     if not db_menu:
         raise HTTPException(status_code=404, detail="Menú no encontrado")
-    db_menu.date = menu.date
-    db_menu.first_course = menu.first_course
-    db_menu.second_course = menu.second_course
-    db_menu.dessert = menu.dessert
+    db_menu.name = menu.name
+    db_menu.menu_date = menu.menu_date
+    db_menu.description = menu.description
     db_menu.price = menu.price
+    db_menu.category_id = menu.category_id
+    db_menu.is_active = menu.is_active
+    db_menu.image_url = menu.image_url
     db.commit()
     db.refresh(db_menu)
     return db_menu
