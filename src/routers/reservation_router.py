@@ -1,8 +1,8 @@
+import random
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db import SessionLocal
 from src.models.reservation_model import Reservation
-from src.models.table_model import Table
 from src.schemas.reservation_schema import ReservationCreate, ReservationRead
 
 # Router independiente para reservas
@@ -24,24 +24,21 @@ def get_db():
 def get_reservations(db: Session = Depends(get_db)):
     return db.query(Reservation).all()
 
+def generate_reservation_code(db: Session) -> str:
+    """Genera un código único de 4 dígitos numéricos."""
+    while True:
+        code = f"{random.randint(0, 9999):04d}"
+        existing = db.query(Reservation).filter(Reservation.reservation_code == code).first()
+        if not existing:
+            return code
+
 # Crear nueva reserva
 @router.post("/", response_model=ReservationRead)
 def create_reservation(reservation: ReservationCreate, db: Session = Depends(get_db)):
-    table = db.query(Table).filter(Table.id == reservation.table_id).first()
-    if not table:
-        raise HTTPException(status_code=404, detail="Mesa no encontrada")
-    if reservation.guests > table.capacity:
-        raise HTTPException(status_code=400, detail="Número de invitados excede la capacidad de la mesa")
-    existing = db.query(Reservation).filter(
-        Reservation.table_id == reservation.table_id,
-        Reservation.date == reservation.date,
-        Reservation.status == "active"
-    ).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Mesa ya reservada para esta fecha")
-
+    code = generate_reservation_code(db)
     db_reservation = Reservation(
-        table_id=reservation.table_id,
+        reservation_code=code,
+        time=reservation.time,
         customer_name=reservation.customer_name,
         date=reservation.date,
         guests=reservation.guests
@@ -56,14 +53,13 @@ def create_reservation(reservation: ReservationCreate, db: Session = Depends(get
 def get_reservations_by_user(user_id: int, db: Session = Depends(get_db)):
     return db.query(Reservation).filter(Reservation.customer_name == user_id).all()
 
-# Cancelar reserva
-@router.delete("/{reservation_id}", response_model=ReservationRead)
-def cancel_reservation(reservation_id: int, db: Session = Depends(get_db)):
+# Eliminar reserva
+@router.delete("/{reservation_id}")
+def delete_reservation(reservation_id: int, db: Session = Depends(get_db)):
     reservation = db.query(Reservation).filter(Reservation.id == reservation_id).first()
     if not reservation:
         raise HTTPException(status_code=404, detail="Reserva no encontrada")
     
-    reservation.status = "cancelled"
+    db.delete(reservation)
     db.commit()
-    db.refresh(reservation)
-    return reservation
+    return {"message": "Reserva cancelada correctamente"}

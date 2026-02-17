@@ -35,16 +35,16 @@ def get_review(review_id: int, db: Session = Depends(get_db)):
 # Crear nueva reseña
 @router.post("/", response_model=ReviewRead)
 def create_review(review: ReviewCreate, db: Session = Depends(get_db)):
-    reservation = db.query(Reservation).filter(Reservation.id == review.reservation_id).first()
+    reservation = db.query(Reservation).filter(Reservation.reservation_code == review.reservation_code).first()
     if not reservation:
         raise HTTPException(status_code=404, detail="Reserva no encontrada")
 
-    existing = db.query(Review).filter(Review.reservation_id == review.reservation_id).first()
+    existing = db.query(Review).filter(Review.reservation_code == review.reservation_code).first()
     if existing:
         raise HTTPException(status_code=400, detail="Ya existe una reseña para esta reserva")
 
     db_review = Review(
-        reservation_id=review.reservation_id,
+        reservation_code=review.reservation_code,
         rating=review.rating,
         comment=review.comment
     )

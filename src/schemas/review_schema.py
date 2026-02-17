@@ -4,7 +4,7 @@ from datetime import datetime
 
 # Schema para crear una reseña
 class ReviewCreate(BaseModel):
-    reservation_id: int                              # ID de la reserva
+    reservation_code: str                            # Código de reserva (4 dígitos)
     rating: int = Field(..., ge=1, le=5)             # Puntuación de 1 a 5
     comment: str                                     # Comentario obligatorio
 

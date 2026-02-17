@@ -8,7 +8,7 @@ class Review(Base):
     __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True)
-    reservation_id = Column(Integer, ForeignKey("reservations.id"), nullable=False)
+    reservation_code = Column(String(4), ForeignKey("reservations.reservation_code"), nullable=False)
     rating = Column(Integer, nullable=False)                  # Puntuación de 1 a 5
     comment = Column(String(500), nullable=False)              # Comentario obligatorio
     created_at = Column(DateTime, default=datetime.utcnow)    # Fecha de creación
