@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from db import SessionLocal
 from src.models.reservation_model import Reservation
+from src.models.review_model import Review
 from src.schemas.reservation_schema import ReservationCreate, ReservationRead
 
 # Router independiente para reservas
@@ -60,6 +61,8 @@ def delete_reservation(reservation_id: int, db: Session = Depends(get_db)):
     if not reservation:
         raise HTTPException(status_code=404, detail="Reserva no encontrada")
     
+    # Eliminar reseñas asociadas antes de eliminar la reserva (FK constraint)
+    db.query(Review).filter(Review.reservation_code == reservation.reservation_code).delete()
     db.delete(reservation)
     db.commit()
     return {"message": "Reserva cancelada correctamente"}
