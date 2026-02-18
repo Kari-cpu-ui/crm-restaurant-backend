@@ -67,7 +67,7 @@ def create_menu(menu: MenuCreate, db: Session = Depends(get_db)):
         price=menu.price,
         category_id=1,
         is_active=1,
-        image_url=menu.image_url
+        image_url=menu.image_url if menu.image_url else None
     )
     db.add(db_menu)
     db.commit()
