@@ -28,4 +28,3 @@ FastAPI
 
 MySQL
 
-Eso ya lo hace ver profesional.
